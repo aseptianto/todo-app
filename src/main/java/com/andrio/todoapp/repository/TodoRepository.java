@@ -1,11 +1,9 @@
 package com.andrio.todoapp.repository;
 
-import com.andrio.todoapp.model.TodoUser;
+import com.andrio.todoapp.model.Todo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<TodoUser, Long> {
-
-    TodoUser findByEmail(String email);
+public interface TodoRepository extends JpaRepository<Todo, Long> {
 }

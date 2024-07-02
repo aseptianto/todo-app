@@ -7,31 +7,49 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "todos")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Todo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String email;
+    private String uuid;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String password;
+    @Column()
+    private String description;
+
+    @Column()
+    private String status;
+
+    @Column(nullable = false, name = "is_deleted")
+    private String isDeleted;
+
+    @Column()
+    private String priority;
+
+    @Column(name = "due_date")
+    private Timestamp dueDate;
 
     @Column(name = "created_at")
     private Timestamp createdAt;
 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
+
+    @OneToMany()
+    @JoinColumn(name = "todo_id")
+    private List<TodoUserAssociation> todoUserAssociations;
 
 }
