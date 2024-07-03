@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -41,7 +42,7 @@ public class Todo {
     private String priority;
 
     @Column(name = "due_date")
-    private Timestamp dueDate;
+    private LocalDate dueDate;
 
     @Column(name = "created_at")
     private Timestamp createdAt;

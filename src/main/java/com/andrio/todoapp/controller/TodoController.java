@@ -1,16 +1,19 @@
 package com.andrio.todoapp.controller;
 
 import com.andrio.todoapp.dto.TodoUserDto;
+import com.andrio.todoapp.model.Status;
 import com.andrio.todoapp.model.Todo;
 import com.andrio.todoapp.service.TodoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -30,8 +33,14 @@ public class TodoController {
     }
 
     @GetMapping
-    public List<Todo> getAll(@RequestParam(required = false) String filter, HttpServletRequest request) {
+    public List<Todo> getAll(@RequestParam(required = false) Status status,
+                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                             HttpServletRequest request) {
         Long userId = ((TodoUserDto) request.getAttribute("todoUserDTO")).getId();
-        return todoService.getAllTodosByUserId(userId);
+        logger.error(status.toString());
+        logger.error(startDate.toString());
+        logger.error(endDate.toString());
+        return todoService.getFilteredTodos(userId, status, startDate, endDate);
     }
 }
