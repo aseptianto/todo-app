@@ -1,10 +1,13 @@
 package com.andrio.todoapp.controller;
 
+import com.andrio.todoapp.dto.ErrorResponse;
 import com.andrio.todoapp.dto.LoginRequest;
 import com.andrio.todoapp.dto.LoginResponse;
+import com.andrio.todoapp.exception.UserNotFoundException;
 import com.andrio.todoapp.service.UserService;
 import com.andrio.todoapp.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,13 +28,19 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        Optional<String> token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+        try {
+            Optional<String> token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
 
-        if (token.isPresent()) {
-            LoginResponse loginResponse = new LoginResponse(token.get());
-            return ResponseEntity.ok(loginResponse);
-        } else {
-            return ResponseEntity.status(401).body("Invalid email or password");
+            if (token.isPresent()) {
+                LoginResponse loginResponse = new LoginResponse(token.get());
+                return ResponseEntity.ok(loginResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid email or password"));
+            }
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid email or password"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Whoops! Something went wrong. Please try again later."));
         }
     }
 }

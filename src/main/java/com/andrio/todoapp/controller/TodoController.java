@@ -1,6 +1,6 @@
 package com.andrio.todoapp.controller;
 
-import com.andrio.todoapp.dto.TodoUserDTO;
+import com.andrio.todoapp.dto.TodoUserDto;
 import com.andrio.todoapp.model.Todo;
 import com.andrio.todoapp.service.TodoService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class TodoController {
 
     @GetMapping
     public List<Todo> getAll(@RequestParam(required = false) String filter, HttpServletRequest request) {
-        Long userId = ((TodoUserDTO) request.getAttribute("todoUserDTO")).getId();
+        Long userId = ((TodoUserDto) request.getAttribute("todoUserDTO")).getId();
         return todoService.getAllTodosByUserId(userId);
     }
 }

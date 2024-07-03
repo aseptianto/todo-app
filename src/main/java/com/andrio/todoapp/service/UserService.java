@@ -1,5 +1,8 @@
 package com.andrio.todoapp.service;
 
+import com.andrio.todoapp.dto.UserRegistrationDto;
+import com.andrio.todoapp.exception.UserAlreadyExistsException;
+import com.andrio.todoapp.exception.UserNotFoundException;
 import com.andrio.todoapp.model.TodoUser;
 import com.andrio.todoapp.repository.UserRepository;
 import com.andrio.todoapp.util.JwtUtil;
@@ -44,6 +47,9 @@ public class UserService {
 
     public Optional<String> loginUser(String email, String password) {
         TodoUser user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User with email " + email + " not found");
+        }
         logger.error("User found: {}", user);
         boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
         if (passwordMatch) {
@@ -55,5 +61,18 @@ public class UserService {
 
     public void logoutUser(String token) {
         tokenService.invalidateToken(token);
+    }
+
+    public TodoUser registerUser(UserRegistrationDto userRegistrationDto) {
+        TodoUser existingUser = userRepository.findByEmail(userRegistrationDto.getEmail());
+        if (existingUser != null) {
+            throw new UserAlreadyExistsException("User with email " + userRegistrationDto.getEmail() + " already exists");
+        }
+
+        TodoUser user = new TodoUser();
+        user.setEmail(userRegistrationDto.getEmail());
+        user.setName(userRegistrationDto.getName());
+        user.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
+        return userRepository.save(user);
     }
 }

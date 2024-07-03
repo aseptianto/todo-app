@@ -30,8 +30,9 @@ public class Todo {
     @Column()
     private String description;
 
-    @Column()
-    private String status;
+    @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
+    private Status status;
 
     @Column(nullable = false, name = "is_deleted")
     private String isDeleted;

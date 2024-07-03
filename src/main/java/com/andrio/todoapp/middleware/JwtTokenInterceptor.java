@@ -1,6 +1,6 @@
 package com.andrio.todoapp.middleware;
 
-import com.andrio.todoapp.dto.TodoUserDTO;
+import com.andrio.todoapp.dto.TodoUserDto;
 import com.andrio.todoapp.service.TokenService;
 import com.andrio.todoapp.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +43,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
-        TodoUserDTO todoUserDTO = jwtUtil.extractUserDetails(token);
+        TodoUserDto todoUserDTO = jwtUtil.extractUserDetails(token);
         request.setAttribute("todoUserDTO", todoUserDTO);
         logger.error(todoUserDTO.toString());
         return true;

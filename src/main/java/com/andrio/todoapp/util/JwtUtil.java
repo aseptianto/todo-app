@@ -1,6 +1,6 @@
 package com.andrio.todoapp.util;
 
-import com.andrio.todoapp.dto.TodoUserDTO;
+import com.andrio.todoapp.dto.TodoUserDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -46,8 +46,8 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    public TodoUserDTO extractUserDetails(String token) {
+    public TodoUserDto extractUserDetails(String token) {
         Claims claims = extractAllClaims(token);
-        return new TodoUserDTO(claims.get("userId", Long.class), claims.getSubject(), claims.get("name", String.class));
+        return new TodoUserDto(claims.get("userId", Long.class), claims.getSubject(), claims.get("name", String.class));
     }
 }

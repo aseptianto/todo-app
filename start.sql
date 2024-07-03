@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users(
-    id bigint(20) PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -11,7 +11,7 @@ INSERT INTO users(id, email, name, password) VALUES
 (1, 'andrio@email.com', 'Andrio', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK");
 
 CREATE TABLE IF NOT EXISTS todos(
-    id bigint(20) PRIMARY KEY,
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     uuid VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -31,7 +31,7 @@ INSERT INTO todos(id, uuid, name, description, due_date, status, is_deleted, pri
 (5, '16de87f0-aad8-4a71-8597-dea604e06322', 'Todo 5', 'Description 5', '2021-12-12 00:00:00', 1, false, 5);
 
 CREATE TABLE IF NOT EXISTS todos_users(
-    id bigint(20) PRIMARY KEY,
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     todo_id bigint(20),
     user_id bigint(20),
     role SMALLINT,
@@ -47,7 +47,7 @@ INSERT INTO todos_users(id, todo_id, user_id, role) VALUES
 (5, 5, 1, 1);
 
 CREATE TABLE IF NOT EXISTS activity_logs(
-    id bigint(20) PRIMARY KEY,
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     todo_id bigint(20),
     user_id bigint(20),
     action SMALLINT,
@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS activity_logs(
 );
 
 CREATE TABLE IF NOT EXISTS users_activity_logs(
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     todo_id bigint(20),
     user_id bigint(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -63,14 +64,14 @@ CREATE TABLE IF NOT EXISTS users_activity_logs(
 );
 
 CREATE TABLE IF NOT EXISTS tags(
-    id bigint(20) PRIMARY KEY,
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS todos_tags(
-    id bigint(20) PRIMARY KEY,
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     todo_id VARCHAR(255),
     tag_id VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
