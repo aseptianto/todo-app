@@ -27,14 +27,17 @@ public class TodoUserAssociation {
     @Column(name = "todo_id")
     private Long todoId;
 
-    @Transient
-    @JsonProperty("user")
-    private TodoUserDTO todoUserDTO;
+    @Column(name = "user_id")
+    private Long todoUserId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
-    private TodoUser todoUser;
+//    @Transient
+//    @JsonProperty("user")
+//    private TodoUserDTO todoUserDTO;
+
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    @JsonIgnore
+//    private TodoUser todoUser;
 
     @Column
     private Short role;
@@ -45,11 +48,11 @@ public class TodoUserAssociation {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
-    @PostLoad
-    private void fillDTO() {
-        this.todoUserDTO = TodoUserDTO.builder()
-                .id(this.todoUser.getId())
-                .name(this.todoUser.getName())
-                .build();
-    }
+//    @PostLoad
+//    private void fillDTO() {
+//        this.todoUserDTO = TodoUserDTO.builder()
+//                .id(this.todoUser.getId())
+//                .name(this.todoUser.getName())
+//                .build();
+//    }
 }

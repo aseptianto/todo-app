@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users(
 );
 
 INSERT INTO users(id, email, name, password) VALUES
-(1, 'andrio@email.com', 'Andrio', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK"); --123456
+(1, 'andrio@email.com', 'Andrio', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK");
 
 CREATE TABLE IF NOT EXISTS todos(
     id bigint(20) PRIMARY KEY,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS todos(
     name VARCHAR(255) NOT NULL,
     description TEXT,
     due_date TIMESTAMP,
-    status SMALLINT DEFAULT 0 COMMENT '0: Not started, 1: In progress, 2: Completed'
+    status SMALLINT DEFAULT 0 COMMENT '0: Not started, 1: In progress, 2: Completed',
     is_deleted BOOLEAN DEFAULT 0,
     priority INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

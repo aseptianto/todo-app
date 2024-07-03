@@ -4,10 +4,11 @@ import com.andrio.todoapp.dto.LoginRequest;
 import com.andrio.todoapp.dto.LoginResponse;
 import com.andrio.todoapp.service.UserService;
 import com.andrio.todoapp.util.JwtUtil;
-import com.mysql.cj.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/login")
@@ -24,11 +25,10 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        boolean isValid = userService.validateUser(loginRequest.getEmail(), loginRequest.getPassword());
+        Optional<String> token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
 
-        if (isValid) {
-            String token = jwtUtil.generateToken(loginRequest.getEmail());
-            LoginResponse loginResponse = new LoginResponse(token);
+        if (token.isPresent()) {
+            LoginResponse loginResponse = new LoginResponse(token.get());
             return ResponseEntity.ok(loginResponse);
         } else {
             return ResponseEntity.status(401).body("Invalid email or password");

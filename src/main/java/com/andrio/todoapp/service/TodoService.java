@@ -1,9 +1,7 @@
 package com.andrio.todoapp.service;
 
 import com.andrio.todoapp.model.Todo;
-import com.andrio.todoapp.model.TodoUser;
 import com.andrio.todoapp.repository.TodoRepository;
-import com.andrio.todoapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,7 @@ public class TodoService {
         this.todoRepository = todoRepository;
     }
 
-    public List<Todo> getAllTodos() {
-        return todoRepository.findAll();
+    public List<Todo> getAllTodosByUserId(Long userId) {
+        return todoRepository.findByUserId(userId);
     }
 }
