@@ -23,15 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
 
-    // This is a placeholder for the service that fetches the users.
-    // You would typically use @Autowired to inject this service.
     private final TodoService todoService;
 
     private static final Logger logger = LoggerFactory.getLogger(TodoController.class);

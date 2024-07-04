@@ -5,7 +5,6 @@ import com.andrio.todoapp.dto.LoginRequest;
 import com.andrio.todoapp.dto.LoginResponse;
 import com.andrio.todoapp.exception.UserNotFoundException;
 import com.andrio.todoapp.service.UserService;
-import com.andrio.todoapp.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,10 @@ import java.util.Optional;
 public class LoginController {
 
     private final UserService userService;
-    private final JwtUtil jwtUtil;
 
     @Autowired
-    public LoginController(UserService userService, JwtUtil jwtUtil) {
+    public LoginController(UserService userService) {
         this.userService = userService;
-        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping

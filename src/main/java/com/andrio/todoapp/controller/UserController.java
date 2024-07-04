@@ -16,8 +16,6 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    // This is a placeholder for the service that fetches the users.
-    // You would typically use @Autowired to inject this service.
     private final UserService userService;
 
     @Autowired

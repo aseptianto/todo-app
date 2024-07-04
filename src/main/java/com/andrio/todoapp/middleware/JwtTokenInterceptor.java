@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 
 @Component
@@ -61,16 +60,6 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             response.getWriter().write(convertObjectToJson(new ErrorResponse("Whoops! Something went wrong. Please try again later.")));
             return false;
         }
-    }
-
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        // Post-handle logic if needed
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        // Cleanup logic if needed
     }
 
     private String convertObjectToJson(Object object) {
