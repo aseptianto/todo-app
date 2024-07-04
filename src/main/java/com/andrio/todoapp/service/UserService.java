@@ -50,7 +50,6 @@ public class UserService {
         if (user == null) {
             throw new UserNotFoundException("User with email " + email + " not found");
         }
-        logger.error("User found: {}", user);
         boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
         if (passwordMatch) {
             return Optional.of(jwtUtil.generateToken(user.getId(), user.getEmail(), user.getName()));

@@ -47,7 +47,6 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             }
             TodoUserDto todoUserDTO = jwtUtil.extractUserDetails(token);
             request.setAttribute("todoUserDTO", todoUserDTO);
-            logger.error(todoUserDTO.toString());
             return true;
         } catch (AuthorizationFailedException | ExpiredJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
