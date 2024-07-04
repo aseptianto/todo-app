@@ -1,8 +1,13 @@
 package com.andrio.todoapp.middleware;
 
+import com.andrio.todoapp.dto.ErrorResponse;
 import com.andrio.todoapp.dto.TodoUserDto;
+import com.andrio.todoapp.exception.AuthorizationFailedException;
 import com.andrio.todoapp.service.TokenService;
 import com.andrio.todoapp.util.JwtUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -30,23 +35,32 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("Authorization");
-        if (token == null) {
+        try {
+            if (token == null) {
+                throw new AuthorizationFailedException("Authorization header is missing");
+            }
+            if (!token.startsWith("Bearer ")) {
+                throw new AuthorizationFailedException("Invalid token format");
+            }
+            token = token.substring(7);
+            if (tokenService.isTokenInvalid(token)) {
+                throw new AuthorizationFailedException("Invalid token");
+            }
+            TodoUserDto todoUserDTO = jwtUtil.extractUserDetails(token);
+            request.setAttribute("todoUserDTO", todoUserDTO);
+            logger.error(todoUserDTO.toString());
+            return true;
+        } catch (AuthorizationFailedException | ExpiredJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(convertObjectToJson(new ErrorResponse("Unable to verify token. Please login again.")));
+            return false;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.getWriter().write(convertObjectToJson(new ErrorResponse("Whoops! Something went wrong. Please try again later.")));
             return false;
         }
-        if (!token.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-        token = token.substring(7);
-        if (tokenService.isTokenInvalid(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-        TodoUserDto todoUserDTO = jwtUtil.extractUserDetails(token);
-        request.setAttribute("todoUserDTO", todoUserDTO);
-        logger.error(todoUserDTO.toString());
-        return true;
     }
 
     @Override
@@ -57,5 +71,13 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         // Cleanup logic if needed
+    }
+
+    private String convertObjectToJson(Object object) {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            return "";
+        }
     }
 }

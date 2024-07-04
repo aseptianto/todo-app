@@ -5,6 +5,7 @@ import com.andrio.todoapp.model.Todo;
 import com.andrio.todoapp.model.TodoUserAssociation;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -21,6 +22,9 @@ public interface TodoRepository extends JpaRepository<Todo, Long>, JpaSpecificat
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            // not deleted
+            predicates.add(criteriaBuilder.equal(root.get("isDeleted"), false));
+
             Join<Todo, TodoUserAssociation> todoUserJoin = root.join("todoUserAssociations");
 
             if (userId != null) {
@@ -35,4 +39,6 @@ public interface TodoRepository extends JpaRepository<Todo, Long>, JpaSpecificat
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
+
+    List<Todo> findAll(Specification<Todo> spec, Sort sort);
 }

@@ -35,8 +35,9 @@ public class TodoUserAssociation {
 //    @JsonIgnore
 //    private TodoUser todoUser;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column
-    private Short role;
+    private Role role;
 
     @Column(name = "created_at")
     private Timestamp createdAt;
@@ -52,3 +53,4 @@ public class TodoUserAssociation {
 //                .build();
 //    }
 }
+

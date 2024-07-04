@@ -35,8 +35,8 @@ public class Todo {
     @Column(nullable = false)
     private Status status;
 
-    @Column(nullable = false, name = "is_deleted")
-    private String isDeleted;
+    @Column(nullable = false, name = "is_deleted", columnDefinition = "boolean default false")
+    private boolean isDeleted;
 
     @Column()
     private String priority;
