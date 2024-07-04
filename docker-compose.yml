@@ -29,11 +29,5 @@ services:
 
     volumes:
       - .m2:/root/.m2
-#  testapp:
-#    image: ubuntu:latest
-#    restart: always
-#    networks:
-#      - springapimysql-net
-#    command: tail -f /dev/null
 networks:
   springapimysql-net:
