@@ -1,0 +1,33 @@
+services:
+  mysqldb:
+    image: "mysql:8.0"
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - springapimysql-net
+    environment:
+      MYSQL_DATABASE: tododb
+      MYSQL_USER: todo_user
+      MYSQL_PASSWORD: todo_password123
+      MYSQL_ROOT_PASSWORD: strong_password
+    volumes:
+      - ./start.sql:/docker-entrypoint-initdb.d/start.sql
+  todoapp:
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    links:
+      - "mysqldb:mysqldb"
+    networks:
+      - springapimysql-net
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysqldb:3306/tododb?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+    depends_on:
+      - mysqldb
+
+    volumes:
+      - .m2:/root/.m2
+networks:
+  springapimysql-net:

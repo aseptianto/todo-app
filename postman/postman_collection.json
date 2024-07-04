@@ -1,0 +1,446 @@
+{
+  "info": {
+    "_postman_id": "784d5c31-c836-44c2-9717-34f0de6f38d3",
+    "name": "Todo API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3395252"
+  },
+  "item": [
+    {
+      "name": "Get All Todos for a user with filters and sorting",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"startDate\": \"2021-12-14T00:00:00.000+00:00\",\n    \"endDate\": \"2021-12-15T00:00:00.000+00:00\",\n    \"sort\": \"name\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{domain}}:{{port}}/todos?sort=priority&startDate=2021-12-10&endDate=2025-12-16&sortDirection=desc",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "todos"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "priority"
+            },
+            {
+              "key": "startDate",
+              "value": "2021-12-10"
+            },
+            {
+              "key": "endDate",
+              "value": "2025-12-16"
+            },
+            {
+              "key": "sortDirection",
+              "value": "desc"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Get All Todos for a user",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"startDate\": \"2021-12-14T00:00:00.000+00:00\",\n    \"endDate\": \"2021-12-15T00:00:00.000+00:00\",\n    \"sort\": \"name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}:{{port}}/todos",
+              "host": [
+                "{{domain}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "priority",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": "2021-12-10",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-16",
+                  "disabled": true
+                },
+                {
+                  "key": "sortDirection",
+                  "value": "desc",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": null
+        },
+        {
+          "name": "Get All Todos for a user with sorting",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"startDate\": \"2021-12-14T00:00:00.000+00:00\",\n    \"endDate\": \"2021-12-15T00:00:00.000+00:00\",\n    \"sort\": \"name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}:{{port}}/todos?sort=priority&sortDirection=desc",
+              "host": [
+                "{{domain}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "priority"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2021-12-10",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-16",
+                  "disabled": true
+                },
+                {
+                  "key": "sortDirection",
+                  "value": "desc"
+                }
+              ]
+            }
+          },
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": null
+        },
+        {
+          "name": "Get All Todos for a user with status filter",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"startDate\": \"2021-12-14T00:00:00.000+00:00\",\n    \"endDate\": \"2021-12-15T00:00:00.000+00:00\",\n    \"sort\": \"name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{domain}}:{{port}}/todos?sort=priority&startDate=2021-12-10&endDate=2025-12-16&sortDirection=desc&status=NOT_STARTED",
+              "host": [
+                "{{domain}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "todos"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "priority"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2021-12-10"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-16"
+                },
+                {
+                  "key": "sortDirection",
+                  "value": "desc"
+                },
+                {
+                  "key": "status",
+                  "value": "NOT_STARTED"
+                }
+              ]
+            }
+          },
+          "_postman_previewlanguage": null,
+          "header": null,
+          "cookie": [],
+          "body": null
+        }
+      ]
+    },
+    {
+      "name": "Login User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set(\"token\", \"Bearer \" + jsonData.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"andrio@email.com\",\n    \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{domain}}:{{port}}/login",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{domain}}:{{port}}/logout",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"dada@email.com\",\n    \"name\": \"Dada\",\n    \"password\": \"123456\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{domain}}:{{port}}/users/register",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "users",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Todo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb2RvQGVtYWlsLmNvbSIsIm5hbWUiOiJEb2RvIiwiZXhwIjoxNzIwMTQwNTQ0LCJ1c2VySWQiOjIsImlhdCI6MTcyMDEwNDU0NH0.SwUEzBN-S36eDFXVTjsreitpcWLicXL5wx71jjl_80U42c6jUHa8DiySCBP7S__HfWU4OwDWlj9JCtopAUb6QA",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"todo 6\",\n    \"description\": \"description todo 6\",\n    \"dueDate\": \"2024-07-02\",\n    \"status\": \"NOT_STARTED\",\n    \"priority\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{domain}}:{{port}}/todos",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "todos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Todo",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbmRyaW9AZW1haWwuY29tIiwibmFtZSI6IkFuZHJpbyIsImV4cCI6MTcyMDEwMjAzMiwidXNlcklkIjoxLCJpYXQiOjE3MjAwNjYwMzJ9.QTfU-K8Q-qamuNgea3ECSHMCWhCys4hYUWVVBcVojWc_x2rAbdLN8aZdOdxv5ns9ju3E4s8Dxhd-4flsmZFXhw",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{domain}}:{{port}}/todos/6",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "todos",
+            "6"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Todo",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb2RvQGVtYWlsLmNvbSIsIm5hbWUiOiJEb2RvIiwiZXhwIjoxNzIwMTI2NTAzLCJ1c2VySWQiOjIsImlhdCI6MTcyMDA5MDUwM30.M507TF2WJSprcT81nWTwiQvyPfB9sJgi2s0oicBlmOCuFy63ZjY3lQO6U2mqNyy5vjL58AkKUhG927IoahS6fA",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"supdated123\",\n    \"description\": \"description todo 6 updated\",\n    \"dueDate\": \"2024-07-02\",\n    \"status\": \"COMPLETED\",\n    \"priority\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{domain}}:{{port}}/todos/6",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "todos",
+            "6"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Logged In User Information",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbmRyaW9AZW1haWwuY29tIiwibmFtZSI6IkFuZHJpbyIsImV4cCI6MTcyMDE0MTg4MCwidXNlcklkIjoxLCJpYXQiOjE3MjAxMDU4ODB9.jxZRLBepdfzUAZ8_jnRvi2694drKBUkR_LNqPtANJhV8Y3yqeMmDOeultEuHl9N4bTd_uZQXyYN-w5L-j3esPA",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{domain}}:{{port}}/users/self",
+          "host": [
+            "{{domain}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "users",
+            "self"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
