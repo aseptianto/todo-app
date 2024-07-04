@@ -1,10 +1,13 @@
 package com.andrio.todoapp.controller;
 
 import com.andrio.todoapp.dto.ErrorResponse;
+import com.andrio.todoapp.dto.TodoUserDto;
+import com.andrio.todoapp.dto.UserInfoDto;
 import com.andrio.todoapp.dto.UserRegistrationDto;
 import com.andrio.todoapp.exception.UserAlreadyExistsException;
 import com.andrio.todoapp.model.TodoUser;
 import com.andrio.todoapp.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserControllerTests {
@@ -29,15 +32,6 @@ public class UserControllerTests {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void getAllUsersReturnsListOfUsers() {
-        when(userService.getAllUsers()).thenReturn(List.of(new TodoUser(), new TodoUser()));
-
-        List<TodoUser> result = userController.getAll();
-
-        assertEquals(2, result.size());
     }
 
     @Test
@@ -72,5 +66,37 @@ public class UserControllerTests {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Whoops! Something went wrong. Please try again later.", ((ErrorResponse) response.getBody()).getMsg());
+    }
+
+    @Test
+    void getLoggedInUserInfoReturnsUserInfo() {
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        TodoUserDto mockUserDto = new TodoUserDto(1L, "andrio", "andrio@email.com");
+        when(mockRequest.getAttribute("todoUserDTO")).thenReturn(mockUserDto);
+
+        ResponseEntity<?> response = userController.getLoggedInUserInfo(mockRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertInstanceOf(UserInfoDto.class, response.getBody());
+
+        UserInfoDto userInfo = (UserInfoDto) response.getBody();
+        assertEquals("andrio@email.com", userInfo.getEmail());
+        assertEquals("andrio", userInfo.getName());
+    }
+
+    @Test
+    void getLoggedInUserInfoReturnsError() {
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        TodoUserDto mockUserDto = new TodoUserDto(1L, "andrio", "andrio@email.com");
+        when(mockRequest.getAttribute("todoUserDTO")).thenReturn(null);
+
+        ResponseEntity<?> response = userController.getLoggedInUserInfo(mockRequest);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+
+        ErrorResponse errorResponse = (ErrorResponse) response.getBody();
+        assertEquals("Whoops! Something went wrong. Please try again later.", errorResponse.getMsg());
+
     }
 }
