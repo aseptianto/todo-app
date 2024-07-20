@@ -2,12 +2,10 @@ package com.andrio.todoapp.service;
 
 import com.andrio.todoapp.dto.TodoCreateDto;
 import com.andrio.todoapp.dto.TodoUpdateDto;
-import com.andrio.todoapp.model.Role;
-import com.andrio.todoapp.model.Status;
-import com.andrio.todoapp.model.Todo;
-import com.andrio.todoapp.model.TodoUserAssociation;
+import com.andrio.todoapp.model.*;
 import com.andrio.todoapp.repository.TodoRepository;
 import com.andrio.todoapp.repository.TodoUserAssociationRepository;
+import com.andrio.todoapp.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -23,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
@@ -30,14 +29,16 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final TodoUserAssociationRepository todoUserAssociationRepository;
     private final Set<String> allowedSortFields = Set.of("dueDate", "status", "name", "priority");
+    private final UserRepository userRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public TodoService(TodoRepository todoRepository, TodoUserAssociationRepository todoUserAssociationRepository) {
+    public TodoService(TodoRepository todoRepository, TodoUserAssociationRepository todoUserAssociationRepository, UserRepository userRepository) {
         this.todoRepository = todoRepository;
         this.todoUserAssociationRepository = todoUserAssociationRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Todo> getFilteredTodos(Long userId, Status status, LocalDate startDate, LocalDate endDate, String sort, String sortDirection) {
@@ -82,7 +83,7 @@ public class TodoService {
     public Todo updateTodo(Long todoId, Long userId, TodoUpdateDto todoUpdateDto) {
         Todo todo = todoRepository.findById(todoId).orElseThrow(() -> new EntityNotFoundException("Todo not found"));
 
-        TodoUserAssociation association = todo.getTodoUserAssociations().stream()
+        TodoUserAssociation ownerAssociation = todo.getTodoUserAssociations().stream()
                 .filter(a -> a.getTodoUserId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("User not associated with todo"));
@@ -93,7 +94,43 @@ public class TodoService {
         todo.setStatus(todoUpdateDto.getStatus());
         todo.setPriority(todoUpdateDto.getPriority().toString());
         todo.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        return todoRepository.save(todo);
+
+        Todo firstUpdateResult = todoRepository.save(todo);
+
+        boolean isOwner = ownerAssociation.getRole() == Role.OWNER;
+        if (isOwner) {
+            // check if all sharedWithUserIds are real user IDs
+            List<Long> realUserIds = userRepository.findUserIdsByIds(todoUpdateDto.getSharedWithUserIds());
+            if (realUserIds.size() != todoUpdateDto.getSharedWithUserIds().size()) {
+                throw new EntityNotFoundException("Some sharedWithUserIds are invalid");
+            }
+            // handle TodoUserAssociation mapping. Remove those not in sharedWithUserIds and add new ones
+            List<TodoUserAssociation> currentAssociations = todo.getTodoUserAssociations();
+            // filter out the user from sharedWithUserIds
+            List<Long> sharedWithUserIds = todoUpdateDto.getSharedWithUserIds().stream()
+                    .filter(id -> !id.equals(userId))
+                    .toList();;
+            List<TodoUserAssociation> toRemove = currentAssociations.stream().filter(association -> !sharedWithUserIds.contains(association.getTodoUserId()) && association.getRole() != Role.OWNER).toList();
+
+            todoUserAssociationRepository.deleteAll(toRemove);
+
+            Set<Long> currentAssociationsUserIds = currentAssociations.stream().map(TodoUserAssociation::getTodoUserId).collect(Collectors.toSet());
+            List<Long> toAdd = sharedWithUserIds.stream().filter(id -> !currentAssociationsUserIds.contains(id)).toList();
+
+            List<TodoUserAssociation> newAssociations = toAdd.stream()
+                    .map(toAddUserId -> TodoUserAssociation.builder()
+                            .todoId(todoId)
+                            .todoUserId(toAddUserId)
+                            .role(Role.COLLABORATOR)
+                            .createdAt(new Timestamp(System.currentTimeMillis()))
+                            .build())
+                    .toList();
+            todoUserAssociationRepository.saveAll(newAssociations);
+
+            List<TodoUserAssociation> updatedAssociations = todoUserAssociationRepository.findAllByTodoId(todoId);
+            firstUpdateResult.setTodoUserAssociations(updatedAssociations);
+        }
+        return firstUpdateResult;
     }
 
     @Transactional

@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS users(
 
 INSERT INTO users(id, email, name, password) VALUES
 (1, 'andrio@email.com', 'Andrio', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK"),
-(2, 'dodo@email.com', 'Dodo', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK");
+(2, 'dodo@email.com', 'Dodo', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK"),
+(3, 'dudu@email.com', 'Dudu', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK");
 
 CREATE TABLE IF NOT EXISTS todos(
     id bigint(20) PRIMARY KEY AUTO_INCREMENT,

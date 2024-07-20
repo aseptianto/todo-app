@@ -6,6 +6,7 @@ import com.andrio.todoapp.dto.TodoUpdateDto;
 import com.andrio.todoapp.dto.TodoUserDto;
 import com.andrio.todoapp.model.Status;
 import com.andrio.todoapp.model.Todo;
+import com.andrio.todoapp.model.TodoUserAssociation;
 import com.andrio.todoapp.service.TodoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,7 +76,7 @@ public class TodoControllerTests {
 
     @Test
     void updateTodoReturnsUpdatedTodoForValidRequest() {
-        TodoUpdateDto todoUpdateDto = new TodoUpdateDto("task1", "description1", LocalDate.now(), Status.NOT_STARTED, 1);
+        TodoUpdateDto todoUpdateDto = new TodoUpdateDto("task1", "description1", LocalDate.now(), Status.NOT_STARTED, 1, new ArrayList<>());
         when(request.getAttribute("todoUserDTO")).thenReturn(new TodoUserDto(1L, "", ""));
         when(todoService.updateTodo(anyLong(), anyLong(), any(TodoUpdateDto.class))).thenReturn(new Todo());
 
