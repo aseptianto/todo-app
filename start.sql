@@ -55,14 +55,14 @@ CREATE TABLE IF NOT EXISTS activity_logs(
     id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     todo_id bigint(20),
     user_id bigint(20),
-    action SMALLINT,
+    `action` VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users_activity_logs(
     id bigint(20) PRIMARY KEY AUTO_INCREMENT,
-    todo_id bigint(20),
+    activity_logs_id bigint(20),
     user_id bigint(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

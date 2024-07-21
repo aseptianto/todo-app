@@ -2,6 +2,7 @@ package com.andrio.todoapp.service;
 
 import com.andrio.todoapp.dto.TodoCreateDto;
 import com.andrio.todoapp.dto.TodoUpdateDto;
+import com.andrio.todoapp.dto.TodoUserDto;
 import com.andrio.todoapp.model.Role;
 import com.andrio.todoapp.model.Status;
 import com.andrio.todoapp.model.Todo;
@@ -12,11 +13,17 @@ import com.andrio.todoapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +39,9 @@ import static org.mockito.Mockito.*;
 public class TodoServiceTests {
 
     @Mock
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Mock
     private TodoRepository todoRepository;
 
     @Mock
@@ -43,9 +53,14 @@ public class TodoServiceTests {
     @InjectMocks
     private TodoService todoService;
 
+    private TodoUserDto todoUserDto;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        todoUserDto = new TodoUserDto(1L, "test.user", "test.user@email.com");
+        when(kafkaTemplate.send(anyString(), any())).thenReturn(null);
+        todoService = new TodoService(kafkaTemplate, todoRepository, todoUserAssociationRepository, userRepository);
     }
 
     @Test
@@ -85,7 +100,7 @@ public class TodoServiceTests {
         when(todoRepository.findById(1L)).thenReturn(java.util.Optional.of(existingTodo));
         when(todoRepository.save(any(Todo.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        Todo result = todoService.updateTodo(1L, 1L, todoUpdateDto);
+        Todo result = todoService.updateTodo(1L, todoUserDto, todoUpdateDto);
         assertThat(result.getName()).isEqualTo(todoUpdateDto.getName());
     }
 
@@ -108,7 +123,7 @@ public class TodoServiceTests {
         when(todoUserAssociationRepository.findAllByTodoId(todoId)).thenReturn(new ArrayList<>());
 
         // Execute
-        Todo result = todoService.updateTodo(todoId, userId, todoUpdateDto);
+        Todo result = todoService.updateTodo(todoId, todoUserDto, todoUpdateDto);
 
         // Verify
         assertThat(result.getName()).isEqualTo(todoUpdateDto.getName());
@@ -133,7 +148,7 @@ public class TodoServiceTests {
         when(userRepository.findUserIdsByIds(todoUpdateDto.getSharedWithUserIds())).thenReturn(new ArrayList<>());
 
         // Execute & Verify
-        assertThatThrownBy(() -> todoService.updateTodo(todoId, userId, todoUpdateDto))
+        assertThatThrownBy(() -> todoService.updateTodo(todoId, todoUserDto, todoUpdateDto))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("Some sharedWithUserIds are invalid");
     }
@@ -156,9 +171,11 @@ public class TodoServiceTests {
 
         when(todoRepository.findById(todoId)).thenReturn(Optional.of(existingTodo));
         when(todoRepository.save(any(Todo.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(userRepository.findUserIdsByIds(todoUpdateDto.getSharedWithUserIds())).thenReturn(todoUpdateDto.getSharedWithUserIds());
 
+        todoUserDto.setId(2L);
         // Execute
-        Todo result = todoService.updateTodo(todoId, userId, todoUpdateDto);
+        Todo result = todoService.updateTodo(todoId, todoUserDto, todoUpdateDto);
 
         // Verify
         assertThat(result).isNotNull();
@@ -188,7 +205,7 @@ public class TodoServiceTests {
         when(todoUserAssociationRepository.findAllByTodoId(todoId)).thenReturn(List.of(ownerAssociation)); // After update, only owner remains
 
         // Execute
-        Todo result = todoService.updateTodo(todoId, userId, todoUpdateDto);
+        Todo result = todoService.updateTodo(todoId, todoUserDto, todoUpdateDto);
 
         // Verify
         verify(todoUserAssociationRepository).deleteAll(any()); // Verify unshared associations are removed

@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ public class TodoControllerTests {
 
     @Mock
     private TodoService todoService;
+
+    @Mock
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @Mock
     private HttpServletRequest request;
@@ -77,8 +81,9 @@ public class TodoControllerTests {
     @Test
     void updateTodoReturnsUpdatedTodoForValidRequest() {
         TodoUpdateDto todoUpdateDto = new TodoUpdateDto("task1", "description1", LocalDate.now(), Status.NOT_STARTED, 1, new ArrayList<>());
-        when(request.getAttribute("todoUserDTO")).thenReturn(new TodoUserDto(1L, "", ""));
-        when(todoService.updateTodo(anyLong(), anyLong(), any(TodoUpdateDto.class))).thenReturn(new Todo());
+        when(request.getAttribute("todoUserDTO")).thenReturn(new TodoUserDto(1L, "test.user", "test.user@email.com"));
+        TodoUserDto todoUserDto = new TodoUserDto(1L, "test.user", "test.user@email.com");
+        when(todoService.updateTodo(anyLong(), eq(todoUserDto), any(TodoUpdateDto.class))).thenReturn(new Todo());
 
         ResponseEntity<?> response = todoController.updateTodo(1L, todoUpdateDto, request);
 

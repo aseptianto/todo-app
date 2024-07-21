@@ -1,11 +1,15 @@
 package com.andrio.todoapp.service;
 
 import com.andrio.todoapp.dto.TodoCreateDto;
+import com.andrio.todoapp.dto.TodoEventDto;
 import com.andrio.todoapp.dto.TodoUpdateDto;
+import com.andrio.todoapp.dto.TodoUserDto;
 import com.andrio.todoapp.model.*;
 import com.andrio.todoapp.repository.TodoRepository;
 import com.andrio.todoapp.repository.TodoUserAssociationRepository;
 import com.andrio.todoapp.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -13,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -30,12 +35,17 @@ public class TodoService {
     private final TodoUserAssociationRepository todoUserAssociationRepository;
     private final Set<String> allowedSortFields = Set.of("dueDate", "status", "name", "priority");
     private final UserRepository userRepository;
+    private static final String KAFKA_UPDATE_TOPIC = "todo-updates";
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    public TodoService(TodoRepository todoRepository, TodoUserAssociationRepository todoUserAssociationRepository, UserRepository userRepository) {
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Autowired
+    public TodoService(KafkaTemplate<String, String> kafkaTemplate, TodoRepository todoRepository, TodoUserAssociationRepository todoUserAssociationRepository, UserRepository userRepository) {
+        this.kafkaTemplate = kafkaTemplate;
         this.todoRepository = todoRepository;
         this.todoUserAssociationRepository = todoUserAssociationRepository;
         this.userRepository = userRepository;
@@ -80,8 +90,9 @@ public class TodoService {
     }
 
     @Transactional
-    public Todo updateTodo(Long todoId, Long userId, TodoUpdateDto todoUpdateDto) {
+    public Todo updateTodo(Long todoId, TodoUserDto todoUserDto, TodoUpdateDto todoUpdateDto) {
         Todo todo = todoRepository.findById(todoId).orElseThrow(() -> new EntityNotFoundException("Todo not found"));
+        Long userId = todoUserDto.getId();
 
         TodoUserAssociation ownerAssociation = todo.getTodoUserAssociations().stream()
                 .filter(a -> a.getTodoUserId().equals(userId))
@@ -110,7 +121,9 @@ public class TodoService {
             List<Long> sharedWithUserIds = todoUpdateDto.getSharedWithUserIds().stream()
                     .filter(id -> !id.equals(userId))
                     .toList();;
-            List<TodoUserAssociation> toRemove = currentAssociations.stream().filter(association -> !sharedWithUserIds.contains(association.getTodoUserId()) && association.getRole() != Role.OWNER).toList();
+            List<TodoUserAssociation> toRemove = currentAssociations.stream()
+                    .filter(association -> !sharedWithUserIds.contains(association.getTodoUserId()) && association.getRole() != Role.OWNER)
+                    .toList();
 
             todoUserAssociationRepository.deleteAll(toRemove);
 
@@ -130,6 +143,29 @@ public class TodoService {
             List<TodoUserAssociation> updatedAssociations = todoUserAssociationRepository.findAllByTodoId(todoId);
             firstUpdateResult.setTodoUserAssociations(updatedAssociations);
         }
+        // send kafka event
+        try {
+            List<Long> associatedUserIds = todo.getTodoUserAssociations().stream()
+                    .map(TodoUserAssociation::getTodoUserId)
+                    .filter(id -> !id.equals(userId))
+                    .toList();
+            TodoEventDto eventDto = TodoEventDto.builder()
+                    .userId(userId)
+                    .userName(todoUserDto.getName())
+                    .todoId(todoId)
+                    .todoName(todo.getName())
+                    .action("updated")
+                    .associatedUserIds(associatedUserIds)
+                    .build();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String eventJson = null;
+            eventJson = objectMapper.writeValueAsString(eventDto);
+            kafkaTemplate.send(KAFKA_UPDATE_TOPIC, eventJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         return firstUpdateResult;
     }
 

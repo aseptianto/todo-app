@@ -134,9 +134,10 @@ public class TodoController {
     @PutMapping("/{todoId}")
     public ResponseEntity<?> updateTodo(@PathVariable Long todoId, @Valid @RequestBody TodoUpdateDto todoUpdateDto, HttpServletRequest request) {
         Long userId = ((TodoUserDto) request.getAttribute("todoUserDTO")).getId();
+        TodoUserDto todoUserDto = ((TodoUserDto) request.getAttribute("todoUserDTO"));
 
         try {
-            Todo updatedTodo = todoService.updateTodo(todoId, userId, todoUpdateDto);
+            Todo updatedTodo = todoService.updateTodo(todoId, todoUserDto, todoUpdateDto);
             return new ResponseEntity<>(updatedTodo, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
