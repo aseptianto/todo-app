@@ -91,4 +91,54 @@ public class TodoControllerTests {
         assertNotNull(response.getBody());
     }
 
+    void deleteTodoAsOwnerShouldReturnOk() {
+        Long todoId = 1L;
+        TodoUserDto todoUserDto = new TodoUserDto(1L, "owner.user", "owner.user@email.com");
+        when(request.getAttribute("todoUserDTO")).thenReturn(todoUserDto);
+        when(todoService.deleteTodoIfOwner(todoId, todoUserDto)).thenReturn(true);
+
+        ResponseEntity<?> response = todoController.deleteTodo(todoId, request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    void deleteTodoAsNonOwnerShouldReturnBadRequest() {
+        Long todoId = 1L;
+        TodoUserDto todoUserDto = new TodoUserDto(2L, "non.owner.user", "non.owner.user@email.com");
+        when(request.getAttribute("todoUserDTO")).thenReturn(todoUserDto);
+        when(todoService.deleteTodoIfOwner(todoId, todoUserDto)).thenReturn(false);
+
+        ResponseEntity<?> response = todoController.deleteTodo(todoId, request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("User is not the owner of the todo or todo does not exist", ((ErrorResponse) response.getBody()).getMsg());
+    }
+
+    void deleteTodoWithNonExistentTodoShouldReturnBadRequest() {
+        Long todoId = 999L; // Assuming this ID does not exist
+        TodoUserDto todoUserDto = new TodoUserDto(1L, "owner.user", "owner.user@email.com");
+        when(request.getAttribute("todoUserDTO")).thenReturn(todoUserDto);
+        when(todoService.deleteTodoIfOwner(todoId, todoUserDto)).thenReturn(false);
+
+        ResponseEntity<?> response = todoController.deleteTodo(todoId, request);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("User is not the owner of the todo or todo does not exist", ((ErrorResponse) response.getBody()).getMsg());
+    }
+
+    void deleteTodoThrowsInternalServerErrorOnServiceException() {
+        Long todoId = 1L;
+        TodoUserDto todoUserDto = new TodoUserDto(1L, "owner.user", "owner.user@email.com");
+        when(request.getAttribute("todoUserDTO")).thenReturn(todoUserDto);
+        doThrow(RuntimeException.class).when(todoService).deleteTodoIfOwner(todoId, todoUserDto);
+
+        ResponseEntity<?> response = todoController.deleteTodo(todoId, request);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("Whoops! Something went wrong. Please try again later.", ((ErrorResponse) response.getBody()).getMsg());
+    }
+
 }

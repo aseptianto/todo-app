@@ -33,6 +33,9 @@ public class ActivityLog {
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
+    @Column(name = "full_text")
+    private String fullText;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Timestamp(System.currentTimeMillis());

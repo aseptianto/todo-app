@@ -13,17 +13,12 @@ import com.andrio.todoapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -226,14 +221,14 @@ public class TodoServiceTests {
         when(todoRepository.findById(1L)).thenReturn(java.util.Optional.of(existingTodo));
         when(todoRepository.save(any(Todo.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        boolean result = todoService.deleteTodoIfOwner(1L, 1L);
+        boolean result = todoService.deleteTodoIfOwner(1L, todoUserDto);
         assertThat(result).isTrue();
     }
 
     @Test
     void deleteTodoIfOwnerFailsForNonExistentTodo() {
         when(todoRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-        assertThat(todoService.deleteTodoIfOwner(1L, 1L)).isFalse();
+        assertThat(todoService.deleteTodoIfOwner(1L, todoUserDto)).isFalse();
     }
 
     @Test
@@ -249,8 +244,9 @@ public class TodoServiceTests {
         when(todoRepository.findById(1L)).thenReturn(java.util.Optional.of(existingTodo));
         when(todoRepository.save(any(Todo.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        boolean result = todoService.deleteTodoIfOwner(1L, 1L);
+        boolean result = todoService.deleteTodoIfOwner(1L, todoUserDto);
         assertThat(result).isFalse();
     }
 
 }
+

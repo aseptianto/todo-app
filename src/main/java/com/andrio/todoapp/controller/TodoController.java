@@ -133,7 +133,6 @@ public class TodoController {
             })
     @PutMapping("/{todoId}")
     public ResponseEntity<?> updateTodo(@PathVariable Long todoId, @Valid @RequestBody TodoUpdateDto todoUpdateDto, HttpServletRequest request) {
-        Long userId = ((TodoUserDto) request.getAttribute("todoUserDTO")).getId();
         TodoUserDto todoUserDto = ((TodoUserDto) request.getAttribute("todoUserDTO"));
 
         try {
@@ -184,9 +183,9 @@ public class TodoController {
             })
     @DeleteMapping("/{todoId}")
     public ResponseEntity<?> deleteTodo(@PathVariable Long todoId, HttpServletRequest request) {
-        Long userId = ((TodoUserDto) request.getAttribute("todoUserDTO")).getId();
+        TodoUserDto todoUserDto = ((TodoUserDto) request.getAttribute("todoUserDTO"));
         try {
-            boolean isDeleted = todoService.deleteTodoIfOwner(todoId, userId);
+            boolean isDeleted = todoService.deleteTodoIfOwner(todoId, todoUserDto);
             if (isDeleted) {
                 return ResponseEntity.ok().build();
             } else {

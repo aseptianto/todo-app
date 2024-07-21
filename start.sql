@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS activity_logs(
     todo_id bigint(20),
     user_id bigint(20),
     `action` VARCHAR(255),
+    `full_text` TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

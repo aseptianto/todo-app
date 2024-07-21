@@ -170,8 +170,9 @@ public class TodoService {
     }
 
     @Transactional
-    public boolean deleteTodoIfOwner(Long todoId, Long userId) {
+    public boolean deleteTodoIfOwner(Long todoId, TodoUserDto todoUserDto) {
         Todo todo = todoRepository.findById(todoId).orElse(null);
+        Long userId = todoUserDto.getId();
         if (todo == null) {
             return false;
         }
@@ -188,6 +189,28 @@ public class TodoService {
             // user is owner, mark as deleted
             todo.setDeleted(true);
             todoRepository.save(todo);
+            // send kafka event
+            try {
+                List<Long> associatedUserIds = todo.getTodoUserAssociations().stream()
+                        .map(TodoUserAssociation::getTodoUserId)
+                        .filter(id -> !id.equals(userId))
+                        .toList();
+                TodoEventDto eventDto = TodoEventDto.builder()
+                        .userId(userId)
+                        .userName(todoUserDto.getName())
+                        .todoId(todoId)
+                        .todoName(todo.getName())
+                        .action("deleted")
+                        .associatedUserIds(associatedUserIds)
+                        .build();
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                String eventJson = null;
+                eventJson = objectMapper.writeValueAsString(eventDto);
+                kafkaTemplate.send(KAFKA_UPDATE_TOPIC, eventJson);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
             return true;
         }
         return false;
