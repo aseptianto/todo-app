@@ -2,7 +2,6 @@ package com.andrio.todoapp.config;
 
 import com.andrio.todoapp.dto.TodoUserDto;
 import com.andrio.todoapp.middleware.AuthHandshakeInterceptor;
-import com.andrio.todoapp.model.TodoUser;
 import com.andrio.todoapp.repository.WebSocketUserRegistry;
 import com.andrio.todoapp.service.TokenService;
 import com.andrio.todoapp.util.JwtUtil;
@@ -50,8 +49,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");
+        registry.enableSimpleBroker("/topic", "/queue");
         registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override

@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -69,10 +71,16 @@ public class ActivityLogService {
                     String sessionId = webSocketUserRegistry.getSessionIdByUserId(userId);
                     if (sessionId != null) {
                         logger.info("Sending notification to user {} and session {}", userId, sessionId);
-                        messagingTemplate.convertAndSendToUser(sessionId, "/topic/updates", notificationJson);
+                        try {
+                            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+                            headerAccessor.setSessionId(sessionId);
+                            headerAccessor.setLeaveMutable(true);
+                            messagingTemplate.convertAndSendToUser(sessionId, "/queue/updates", notificationJson, headerAccessor.getMessageHeaders());
+                        } catch (Exception e) {
+                            logger.error("Error sending websocket notification: {}", e.getMessage());
+                        }
                     }
                 });
-//                messagingTemplate.convertAndSend("/topic/updates", notificationJson);
             } catch (Exception e) {
                 logger.error("Error sending websocket notification: {}", e.getMessage());
             }
