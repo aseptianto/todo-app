@@ -30,6 +30,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final static Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
+    /**
+     * Constructs a WebSockerConfig
+     * @param tokenService Service for token operations
+     * @param jwtUtil Utility for JWT operations
+     * @param webSocketUserRegistry Registry for tracking WebSocket user sessions
+     */
     @Autowired
     public WebSocketConfig(TokenService tokenService, JwtUtil jwtUtil, WebSocketUserRegistry webSocketUserRegistry) {
         this.tokenService = tokenService;
@@ -37,16 +43,29 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         this.webSocketUserRegistry = webSocketUserRegistry;
     }
 
+    /**
+     * Registers the STOMP endpoints to establish WebSocket communication.\
+     *
+     * @param registry StompEndpointRegistry for configuring endpoints
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws").setAllowedOriginPatterns("*").addInterceptors(authenticationInterceptor());
     }
 
+    /**
+     * Creates a HandshakeInterceptor for authenticating WebSocket connections
+     * @return HandshakeInterceptor
+     */
     @Bean
     public HandshakeInterceptor authenticationInterceptor() {
         return new AuthHandshakeInterceptor(tokenService, jwtUtil);
     }
 
+    /**
+     * Configures the message broker for WebSocket communication. It has /topic and /queue brokers
+     * @param registry MessageBrokerRegistry
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic", "/queue");
@@ -54,9 +73,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setUserDestinationPrefix("/user");
     }
 
+    /**
+     * Configures the WebSocket transport
+     * @param registration WebSocketTransportRegistration
+     */
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         registration.addDecoratorFactory(handler -> new WebSocketHandlerDecorator(handler) {
+            /**
+             * Registers a user session after a WebSocket connection is established
+             * @param session the websocket session created
+             * @throws Exception for errors
+             */
             @Override
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
                 logger.info("Adding websocket session {}", session.getId());
@@ -67,6 +95,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 super.afterConnectionEstablished(session);
             }
 
+            /**
+             * Removes a user session after a WebSocket connection is closed
+             * @param session of the websocket
+             * @param closeStatus CloseStatus
+             * @throws Exception for errors
+             */
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
                 TodoUserDto todoUserDto = (TodoUserDto) session.getAttributes().get("todoUserDTO");

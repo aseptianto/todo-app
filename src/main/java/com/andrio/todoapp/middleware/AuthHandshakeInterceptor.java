@@ -29,9 +29,21 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * Authenticates the WebSocket connection by verifying the token in the query parameter
+     * The format of the WebSocket request is {domain}/ws?token={token}
+     * If the token is missing or invalid, the connection is rejected
+     * {token} is acquired by logging in using the /login HTTP call
+     * E.g. localhost:8080/ws?token=abcde
+     * @param request The WebSocket request
+     * @param response The WebSocket response
+     * @param wsHandler The WebSocket handler
+     * @param attributes The attributes of the WebSocket connection
+     * @return true or false based on whether the connection is authenticated
+     * @throws Exception The error
+     */
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-//        String token = request.getHeaders().getFirst("Authorization");
         String token = null;
         String query = request.getURI().getQuery();
         if (query != null && query.contains("token=")) {

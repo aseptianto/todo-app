@@ -11,7 +11,8 @@ This command will:
 3. Start the application and DB containers
 4. Create the database schema
 5. Seed the database with initial data from start.sql
-6. Application ready to be called at http://localhost:8080
+6. Configure and start Kafka, Redis, and Zookeeper
+7. Application ready to be called at http://localhost:8080 and Websocket at ws://localhost:8080/ws?token={token}
 ## Basic Architecture Diagram
 ![img.png](basic_diagram.png)
 
@@ -24,9 +25,9 @@ This command will:
 2. Todo filtering
 3. Todo sorting
 4. User Authentication and Registration
+5. Todo sharing with multiple users
+6. Todo update notifications using Websockets and Kafka events
 
 ## Feature Wishlist
 1. Tags
-2. Share Todo with multiple users
-3. Push notification of Todo updates from other users using Websockets and Kafka
-4. Pagination & Endless scrolling
+2. Pagination & Endless scrolling
