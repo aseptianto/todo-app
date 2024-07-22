@@ -1,20 +1,25 @@
 package com.andrio.todoapp.repository;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 
 @Repository
 public class TokenRepository {
 
-    private final Set<String> invalidTokens = Collections.synchronizedSet(new HashSet<>());
+    @Autowired
+    private final RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    public TokenRepository(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     public void addInvalidToken(String token) {
-        invalidTokens.add(token);
+        redisTemplate.opsForValue().set(token, "invalid");
     }
 
     public boolean isTokenInvalid(String token) {
-        return invalidTokens.contains(token);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(token));
     }
 }

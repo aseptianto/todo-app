@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS users(
 
 INSERT INTO users(id, email, name, password) VALUES
 (1, 'andrio@email.com', 'Andrio', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK"),
-(2, 'dodo@email.com', 'Dodo', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK");
+(2, 'dodo@email.com', 'Dodo', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK"),
+(3, 'dudu@email.com', 'Dudu', "$2a$12$VzVdmAZWmRZCRDKCxFisG.zhm9xzcL9Br84dXDG2y7TccV3DYO2IK");
 
 CREATE TABLE IF NOT EXISTS todos(
     id bigint(20) PRIMARY KEY AUTO_INCREMENT,
@@ -54,14 +55,15 @@ CREATE TABLE IF NOT EXISTS activity_logs(
     id bigint(20) PRIMARY KEY AUTO_INCREMENT,
     todo_id bigint(20),
     user_id bigint(20),
-    action SMALLINT,
+    `action` VARCHAR(255),
+    `full_text` TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users_activity_logs(
     id bigint(20) PRIMARY KEY AUTO_INCREMENT,
-    todo_id bigint(20),
+    activity_logs_id bigint(20),
     user_id bigint(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

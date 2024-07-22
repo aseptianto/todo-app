@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,6 +40,7 @@ public class JwtTokenInterceptorTests {
     @Test
     void preHandleShouldAllowValidToken() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer validToken");
+        when(request.getMethod()).thenReturn(HttpMethod.GET.name());
         when(tokenService.isTokenInvalid("validToken")).thenReturn(false);
         when(jwtUtil.extractUserDetails("validToken")).thenReturn(new TodoUserDto(1L, "andrio@example.com", "User"));
 
@@ -51,6 +53,7 @@ public class JwtTokenInterceptorTests {
     @Test
     void preHandleShouldRejectMissingAuthorizationHeader() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(null);
+        when(request.getMethod()).thenReturn(HttpMethod.GET.name());
 
         boolean result = jwtTokenInterceptor.preHandle(request, response, null);
 
@@ -61,6 +64,7 @@ public class JwtTokenInterceptorTests {
     @Test
     void preHandleShouldRejectInvalidTokenFormat() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("InvalidTokenFormat");
+        when(request.getMethod()).thenReturn(HttpMethod.GET.name());
 
         boolean result = jwtTokenInterceptor.preHandle(request, response, null);
 

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,4 +29,7 @@ public class TodoUpdateDto {
 
     @NotNull(message = "Priority is required")
     private Integer priority;
+
+    @NotNull(message = "sharedWithUserIds is required")
+    private List<Long> sharedWithUserIds;
 }
