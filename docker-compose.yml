@@ -27,8 +27,15 @@ services:
     depends_on:
       - mysqldb
       - kafka
+      - redis
     volumes:
       - .m2:/root/.m2
+  redis:
+    image: "redis:latest"
+    ports:
+        - '6379:6379'
+    networks:
+      - springapimysql-net
   zookeeper:
     image: 'bitnami/zookeeper:latest'
     ports:

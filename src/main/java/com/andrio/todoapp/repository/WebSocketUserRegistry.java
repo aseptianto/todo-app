@@ -1,28 +1,26 @@
 package com.andrio.todoapp.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class WebSocketUserRegistry {
-    private final ConcurrentHashMap<Long, String> userIdToSessionIdMap = new ConcurrentHashMap<>();
 
-    private final static Logger logger = LoggerFactory.getLogger(WebSocketUserRegistry.class);
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    private final static String WEBSOCKET_USER_REGISTRY = "WEBSOCKET_USER_REGISTRY:";
 
     public void registerUserSession(Long userId, String sessionId) {
-        userIdToSessionIdMap.put(userId, sessionId);
-        logger.info("userregistry after adding {} : {}", sessionId, userIdToSessionIdMap);
+        redisTemplate.opsForValue().set(WEBSOCKET_USER_REGISTRY + userId.toString(), sessionId);
     }
 
-    public void removeUserSession(String sessionId) {
-        userIdToSessionIdMap.values().remove(sessionId);
+    public void removeUserSession(Long userId) {
+        redisTemplate.opsForValue().getOperations().delete(WEBSOCKET_USER_REGISTRY + userId.toString());
     }
 
     public String getSessionIdByUserId(Long userId) {
-        logger.info("userregistry: {}", userIdToSessionIdMap);
-        return userIdToSessionIdMap.get(userId);
+        return redisTemplate.opsForValue().get(WEBSOCKET_USER_REGISTRY + userId.toString());
     }
 }

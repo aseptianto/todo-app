@@ -69,7 +69,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-                webSocketUserRegistry.removeUserSession(session.getId());
+                TodoUserDto todoUserDto = (TodoUserDto) session.getAttributes().get("todoUserDTO");
+                if (todoUserDto != null) {
+                    webSocketUserRegistry.removeUserSession(todoUserDto.getId());
+                }
                 super.afterConnectionClosed(session, closeStatus);
             }
         });
